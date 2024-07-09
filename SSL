@@ -2,14 +2,58 @@
 
 keytool -genkey -keyalg RSA -alias tele -keystore /u01/domains/Prod_Tele_Domain1/security/tele.jks -storepass changeit -validity 400 -keysize 2048
 
+what is your first and last name?
+www.tele.com
+what is your organizationation unit and  name?
+ITO and IT
+US
+US
+Yes
+Now file is created tele.jks
+
+Now copy the path including jks to weblogic keystore using UI.
+
+Creating SSL with Script:
+
+./SSL_AUTO.sh --help
+
+./SSH_AUTO -p pathof the domain secutity folder --keysize 4096 
+now options will come select 13 for self signed certificate
+option 2 for new JKE for weblogic or tomcat
+enter file name tele
+enter alias name tele_cluster
+enter password changeit
+alias name www.tele.com
+and enter organization unit and name and region same like above
+NOw give email and validity number of days 400
+Now select SAN name as SAN
+Number of domains 0-9 give 2
+now type SAN names 
+tele.com
+wsl-host1
+click yes for correct and it will give you scriprt of the keystore and enter.it will create tele.jks at the directory.
+
+
 
 
 Http server:
 
+Create ssl directory in /opt/htppd/ssl and continue below commands to create open ssl:
+
 openssl genrsa -des3 -out www.tele.com.key 1024
 openssl req -new -key www.tele.com.key -out www.tele.com.csr
+
+once you run above two commands you will get two files .key and .csr
+Now creat crt file from below command:
+
 openssl x509 -req -days 365 -in www.tele.com.csr -signkey www.tele.com.key  -out www.tele.com.crt
 
+NOW YOU CAN DO SAMETHING USING SSL_AUTO.sh Script :
+FOR WEBLOGIC AND TOMCAT USE JKE
+FOR APACHE/LB/NGINX USE OPENSSL
+
+ FIRST ENABLE THE SSL MODULE ON HTTP CONG
+vi /opt/htppd/conf/ and remove # at Load Module SSL_Module line
 
 SSL configuration On HTTP Server.
 vi /opt/httpd/conf/extra/httpd-vhosts.conf
@@ -48,7 +92,7 @@ Listen wls-host1:443
 
   <Location /tele_ear>
         SetHandler weblogic-handler
-        WebLogicCluster wls-host1:8080,wls-host1:9080
+        WebLogicCluster wls-host1:8080,wls-host1:9080   # CHANGE THE PORTS TO 8443 AND 8444 FOR SSL
   </Location>
 
   <Location /CityInfoDemo>
@@ -65,6 +109,8 @@ Listen wls-host1:443
 </Directory>
 
 :wq
+
+Stop http server and start.
 
 
 
