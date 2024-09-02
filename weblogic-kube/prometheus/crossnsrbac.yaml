@@ -1,0 +1,48 @@
+# Copyright 2019, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: weblogic-domain-cluster-role
+rules:
+- apiGroups: ["weblogic.oracle"]
+  resources: ["domains"]
+  verbs: ["get", "list"]
+---
+#
+# creating role-bindings for cluster role
+#
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: domain-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: prod-samples-domain-ns
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: weblogic-domain-cluster-role
+  apiGroup: "rbac.authorization.k8s.io"
+---
+#
+# creating role-bindings
+#
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: weblogic-domain-operator-rolebinding
+  namespace: prod-tele-wls-op-ns
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: prod-samples-domain-ns
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: "rbac.authorization.k8s.io"
+---
